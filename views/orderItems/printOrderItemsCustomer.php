@@ -229,12 +229,39 @@ $orderItems->getCountPrintShopItems();
                 'width'=>'137px',
             ),
             'htmlOptions' => array('class' => 'color'),
-        ),/**/        
+        ),/*        
 		array(
 			'name'=>'joiner',
 			'type'=>'raw',
 			'value'=>' $data->joiner == 0 ? "" : "С"' ,
 			'htmlOptions'=>array('width'=>'20px', 'class' => 'text-center'),
+		),
+*/
+        array(
+			'name'=>'joiner',
+			'type' => 'raw',
+			'value' => function($data) {
+				$output = '';
+
+				if ($data->product->productType->product_type_id != "1") {
+					$output .= '<span style=" ">' . 
+								($data->joiner == 1 ? 'C' : '&nbsp;') . 
+							'</span>';
+				}
+
+				if ($data->product->productType->product_type_id == "1") {
+					$output .= '<span style="margin: 5px 0; display: block;   border-bottom: 1px solid #aaa;">' . 
+								($data->joiner_table_top == 1 ? 'C' : '&nbsp;') . 
+							'</span>';
+
+					$output .= '<span style=" margin: 5px 0; display: block;">' . 
+								($data->joiner_table_bottom == 1 ? 'C' : '&nbsp;') . 
+							'</span>';
+				}
+
+				return $output;
+			},
+			'htmlOptions' => array('style' => 'text-align: center; '),
 		),
 
         array(

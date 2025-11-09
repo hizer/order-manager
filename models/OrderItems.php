@@ -26,6 +26,8 @@
  * @property string $modified_by
  * @property string $archive
  * @property string $joiner
+ * @property string $joiner_table_top
+ * @property string $joiner_table_bottom
  * @property string $packing
  * @property string $painter
  * @property string $coating
@@ -37,6 +39,8 @@
  * @property string $primer_table_bottom
  * @property string $upholstery
  * @property string $joiner_updated
+ * @property string $joiner_table_top_updated
+ * @property string $joiner_table_bottom_updated
  * @property string $primer_updated
  * @property string $finish_updated
  * @property string $primer_table_top_updated
@@ -81,7 +85,7 @@ class OrderItems extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('width, length, height, price, quantity', 'required'),
-			array('order_id, product_id, width, insert, length, height, quantity, status_id, tinting, patina, archive, joiner, finish, finish_table_top, finish_table_bottom, coating , packing, painter, primer, primer_table_top, primer_table_bottom, upholstery', 'numerical', 'integerOnly'=>true),
+			array('order_id, product_id, width, insert, length, height, quantity, status_id, tinting, patina, archive, joiner, joiner_table_top, joiner_table_bottom, finish, finish_table_top, finish_table_bottom, coating , packing, painter, primer, primer_table_top, primer_table_bottom, upholstery', 'numerical', 'integerOnly'=>true),
 			array('price, subtotal', 'numerical', 'integerOnly'=>false),
 			array('created_by, modified_by', 'length', 'max'=>32),
             array('comment, comment_prod', 'length', 'max'=>255),
@@ -104,6 +108,8 @@ class OrderItems extends CActiveRecord
             array('status_id', 'default', 'value' => '1'),
             array('archive', 'default', 'value' => '0'),
             array('joiner', 'default', 'value' => '0'),
+            array('joiner_table_top', 'default', 'value' => '0'),
+            array('joiner_table_bottom', 'default', 'value' => '0'),
             array('packing', 'default', 'value' => '0'),
             array('painter', 'default', 'value' => '0'),
             array('coating', 'default', 'value' => '0'),
@@ -176,6 +182,8 @@ class OrderItems extends CActiveRecord
             'modified_by' => 'Змінив',
             'archive' => 'Архів',
             'joiner' => 'Стол.',
+            'joiner_table_top' => 'Стол. верх',
+            'joiner_table_bottom' => 'Стол. низ',
             'coating' => 'Покр',
             'finish' => 'Фініш',
             'finish_table_top' => 'Фініш верх',
@@ -197,6 +205,8 @@ class OrderItems extends CActiveRecord
             'tinting_search'=>'Тонування',
             'shop_search'=>'Магазин',
             'joiner_updated'=>'Стол. оновлено',
+            'joiner_table_top_updated'=>'Стол. верх оновлено',
+            'joiner_table_bottom_updated'=>'Стол. низ оновлено',
             'primer_updated'=>'Грунт оновлено',
             'primer_table_top_updated'=>'Грунт верх оновлено',
             'primer_table_bottom_updated'=>'Грунт низ оновлено',
@@ -296,6 +306,8 @@ class OrderItems extends CActiveRecord
 		$criteria->compare('t.modified_by',$this->modified_by,true);
 		$criteria->compare('t.archive',$this->archive,true);
         $criteria->compare('t.joiner',$this->joiner);
+        $criteria->compare('t.joiner_table_top',$this->joiner_table_top,true);
+        $criteria->compare('t.joiner_table_bottom',$this->joiner_table_bottom,true);
         $criteria->compare('t.packing',$this->packing,true);
         $criteria->compare('t.painter',$this->painter,true);
         $criteria->compare('t.finish',$this->finish,true);
@@ -425,6 +437,8 @@ class OrderItems extends CActiveRecord
 		$criteria->compare('t.modified_by',$this->modified_by,true);
 		$criteria->compare('t.archive',$this->archive,true);
         $criteria->compare('t.joiner',$this->joiner);
+        $criteria->compare('t.joiner_table_top',$this->joiner_table_top,true);
+        $criteria->compare('t.joiner_table_bottom',$this->joiner_table_bottom,true);
         $criteria->compare('t.packing',$this->packing,true);
         $criteria->compare('t.painter',$this->painter,true);
         $criteria->compare('t.finish',$this->finish,true);
@@ -553,6 +567,8 @@ class OrderItems extends CActiveRecord
 		$criteria->compare('t.modified_by',$this->modified_by,true);
 		$criteria->compare('t.archive',$this->archive,true);
         $criteria->compare('t.joiner',$this->joiner,true);
+        $criteria->compare('t.joiner_table_top',$this->joiner_table_top,true);
+        $criteria->compare('t.joiner_table_bottom',$this->joiner_table_bottom,true);
         $criteria->compare('t.packing',$this->packing,true);
         $criteria->compare('t.painter',$this->painter,true);
         $criteria->compare('t.finish',$this->finish,true);
@@ -680,6 +696,8 @@ class OrderItems extends CActiveRecord
 		$criteria->compare('t.modified_by',$this->modified_by,true);
 		$criteria->compare('t.archive',$this->archive,true);
         $criteria->compare('t.joiner',$this->joiner,true);
+        $criteria->compare('t.joiner_table_top',$this->joiner_table_top,true);
+        $criteria->compare('t.joiner_table_bottom',$this->joiner_table_bottom,true);
         $criteria->compare('t.packing',$this->packing,true);
         $criteria->compare('t.painter',$this->painter,true);
         $criteria->compare('t.finish',$this->finish,true);
@@ -807,6 +825,8 @@ class OrderItems extends CActiveRecord
 		$criteria->compare('t.modified_by',$this->modified_by,true);
 		$criteria->compare('t.archive',$this->archive,true);
         $criteria->compare('t.joiner',$this->joiner,true);
+        $criteria->compare('t.joiner_table_top',$this->joiner_table_top,true);
+        $criteria->compare('t.joiner_table_bottom',$this->joiner_table_bottom,true);
         $criteria->compare('t.packing',$this->packing,true);
         $criteria->compare('t.painter',$this->painter,true);
         $criteria->compare('t.finish',$this->finish,true);

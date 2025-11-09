@@ -4,7 +4,19 @@
 ?>
 <?php Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl.'/js/invoice.js?v=09122021',CClientScript::POS_END);?>
 
+<?php
+function generateIcon($value) {
 
+    $iconValue = $value == 1 ? '✔' : '✗';
+    $iconColor = $value == 1 ? '#00e100' : 'red';
+
+    return
+        '<i class="fa   primer-icon"
+           
+            style="color: ' . $iconColor . '; font-size: 29px;"
+            aria-hidden="true">'. $iconValue .'</i>';
+}
+?>
 <form class="form-inline">
 
     <div class="form-group">
@@ -86,8 +98,12 @@ echo CHtml::link(
         ),
     )
 );
-
+// Toggle switch for all columns
+echo '<div class="toggle-switches" style="margin-bottom: 10px; display: inline-block;">';
+echo '<label><input type="checkbox" id="toggle-all-columns"> Додати статуси</label>';
+echo '</div>';
 ?>
+
 <a href="#" id="printButton" class="print bt btn-2 printButton" rel="print" onclick="printPage()"><i class="fa fa-print feature-icon"></i> Друкувати</a>
 <a href="#" id="printButton" class="print bt btn-2 printButton" rel="print" onclick="printPageShipping()"><i class="fa fa-print feature-icon"></i> Погрузочні</a>
 <?php
@@ -173,6 +189,27 @@ if ($model->customer_id > 0){
  
  
 
+
+// Register JavaScript for toggling
+Yii::app()->clientScript->registerScript('toggleAllColumns', "
+    // Function to toggle all specified columns
+    function toggleAllColumns(isChecked) {
+        var columns = ['joiner', 'primer', 'finish', 'upholstery', 'packing'];
+
+        columns.forEach(function(columnClass) {
+            if (isChecked) {
+                $('.' + columnClass).show();
+            } else {
+                $('.' + columnClass).hide();
+            }
+        });
+        
+    }
+    // Bind toggle event to the checkbox
+    $('#toggle-all-columns').change(function() {
+        toggleAllColumns(this.checked);
+    });
+");
  
 echo CHtml::link(
     '<i class="fa fa-save  feature-icon"></i> Зберегти',
@@ -301,6 +338,135 @@ if($model->manager_id == 0 ){
 					'rowCssClassExpression' => '$data->product->productType->product_type_id != 1 ? "bg-chair" : "bg-table"',
                     'columns'=>array(
                         array(
+                            'name' => 'joiner',
+                            'type' => 'raw',
+                            'htmlOptions' => array('class' => 'joiner', 'style' => 'display:none'),
+                            'filter' => array(1 => 'Так', 0 => 'Ні'),
+                            'value' => function ($data) {
+                                $id = $data->primaryKey;
+                                $productType = $data->product->productType->product_type_id;
+                                $links = "";
+                        
+                                // If product type is NOT 1, show a single "joiner" button.
+                                if ($productType != "1") {
+                                    $links .= generateIcon($data->joiner);
+                                }
+                                // If product type is 1, show two buttons: joiner_table_top & joiner_table_bottom.
+                                else {
+                                    $links .= generateIcon($data->joiner_table_top);
+                                    $links .= '<div style="border-bottom: 1px solid #ccc"></div>';
+                                    $links .= generateIcon($data->joiner_table_bottom);
+                                }
+                        
+                                return '<div style="text-align:center;">'.$links.'</div>';
+                            },
+                            'headerHtmlOptions' => array(
+                                'width' => '55px',
+                                'class' => 'joiner',
+                                'style' => 'display:none'
+                            ),
+                        ),
+                        array(
+                            'name' => 'primer',
+                            'type' => 'raw',
+                            'htmlOptions' => array('class' => 'primer', 'style' => 'display:none'), 
+                            'value' => function ($data) {
+                                $id = $data->primaryKey;
+                                $productType = $data->product->productType->product_type_id;
+                                $links = "";
+                        
+                                // If product type is NOT 1, show a single "primer" button.
+                                if ($productType != "1") {
+                                    $links .= generateIcon( $data->primer);
+                                }
+                                // If product type is 1, show two buttons: primer_table_top & primer_table_bottom.
+                                else {
+                                    $links .= generateIcon($data->primer_table_top);
+                                    $links .= '<div style="border-bottom: 1px solid #ccc"></div>';
+                                    $links .= generateIcon( $data->primer_table_bottom);
+                                }
+                        
+                                return '<div style="text-align:center;">'.$links.'</div>';
+                            },
+                            'headerHtmlOptions' => array(
+                                'width' => '55px',
+                                'class' => 'primer',
+                                'style' => 'display:none'
+                            ),
+                        ),
+                        array(
+                            'name' => 'finish',
+                            'type' => 'raw',
+                             'htmlOptions' => array('class' => 'finish', 'style' => 'display:none'),
+                            'value' => function ($data) {
+                                $id = $data->primaryKey;
+                                $productType = $data->product->productType->product_type_id;
+                                $links = "";
+                        
+                                // If product type is NOT 1, show a single "primer" button.
+                                if ($productType != "1") {
+                                    $links .= generateIcon($data->finish);
+                                }
+                                // If product type is 1, show two buttons: primer_table_top & primer_table_bottom.
+                                else {
+                                    $links .= generateIcon( $data->finish_table_top);
+                                    $links .= '<div style="border-bottom: 1px solid #ccc"></div>';
+                                    $links .= generateIcon($data->finish_table_bottom);
+                                }
+                        
+                                return '<div style="text-align:center;">'.$links.'</div>';
+                            },
+                            'headerHtmlOptions' => array(
+                                'width' => '55px',
+                                'class' => 'finish',
+                                'style' => 'display:none'
+                            ),
+                        ),
+                        array(
+                            'name' => 'upholstery',
+                            'type' => 'raw',
+                             'htmlOptions' => array('class' => 'upholstery', 'style' => 'display:none'),
+                            'value' => function ($data) {
+                                $id = $data->primaryKey;
+                                $productType = $data->product->productType->product_type_id;
+                                $links = "";
+                        
+                                // If product type is NOT 1, show a single "primer" button.
+                                if (!$data->isTable($data->order_item_id)) {
+                                    $links .= generateIcon($data->upholstery);
+                                }
+                                
+                        
+                                return '<div style="text-align:center;">'.$links.'</div>';
+                            },
+                            'headerHtmlOptions' => array(
+                                'width' => '55px',
+                                'class' => 'upholstery', 
+                                'style' => 'display:none'
+                            ),
+                        ),
+                         array(
+                            'name' => 'packing',
+                            'type' => 'raw',
+                             'htmlOptions' => array('class' => 'packing', 'style' => 'display:none'),
+                            'value' => function ($data) {
+                                $id = $data->primaryKey;
+                                $productType = $data->product->productType->product_type_id;
+                                $links = "";
+ 
+                                    $links .= generateIcon($data->packing);
+                                 
+                                
+                        
+                                return '<div style="text-align:center;">'.$links.'</div>';
+                            },
+                            'headerHtmlOptions' => array(
+                                'width' => '55px',
+                                'class' => 'packing',
+                                'style' => 'display:none'
+                            ),
+                        ),
+                        array(
                             
                             'header'=>'Поф.',
 							'value'=>' ',
@@ -357,7 +523,7 @@ if($model->manager_id == 0 ){
                             ),
                         ),
                         array(
-                            'header'=>'Од. вим.',
+                            'header'=>'Од. виміру',
                             'value'=>'штук',
                             'htmlOptions'=>array(
                                 'width'=>'100px',

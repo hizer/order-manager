@@ -148,41 +148,45 @@ function createTable(){
 	}
 	 
 	var table = '<div id=\\'citytable\\' class=\\'grid-view\\'><table class=\\'items\\'>'
-	
-	var thCity ='<tr ><td></td>'
-	var thTable ='<tr><td><b>Столи</b></td>'
-	var thChair ='<tr><td><b>Стільці</b></td>'
-	var thTaburet ='<tr><td><b>Табурети</b></td>'
-	
-	for(var i = 0, l = obj.length; l>i; i++){
-		
-		 
-		
-		thCity += '<th>'+obj[i].city+'</th>'
-		if('id1' in obj[i]){
-			thTable += '<td>'+obj[i].id1+'</td>'
-		}
-		if('id2' in obj[i]){
-			thChair += '<td>'+obj[i].id2+'</td>'
-		}
-		if('id3' in obj[i]){
-			thTaburet += '<td>'+obj[i].id3+'</td>'
-		}
-	}
-	thCity +='</tr>'
-	thTable +='</tr>'
-	thChair +='</tr>'
-	thTaburet +='</tr>'
-	
-	table += thCity;
-	table += thTable;
-	table += thChair;
-	table += thTaburet;
-	
-	table += '</table></div>';
-	//console.log('carete' , obj.length)
-	
-	$(table).insertBefore($('#printButtonShop'))
+    var sumTable = 0
+    var sumChair = 0
+	var thCity = '<tr><td></td>'
+    var thTable = '<tr><td id=\\'sumTableCell\\'><b>Столи</b></td>'
+    var thChair = '<tr><td id=\\'sumChairCell\\'><b>Стільці</b></td>'
+    var thTaburet = '<tr><td><b>Табурети</b></td>'
+
+    for (var i = 0, l = obj.length; i < l; i++) {
+        thCity += '<th>' + obj[i].city + '</th>'
+
+        if ('id1' in obj[i]) {
+            thTable += '<td>' + obj[i].id1 + '</td>'
+            sumTable += Number(obj[i].id1)
+        }
+        if ('id2' in obj[i]) {
+            thChair += '<td>' + obj[i].id2 + '</td>'
+            sumChair += Number(obj[i].id2)
+        }
+        if ('id3' in obj[i]) {
+            thTaburet += '<td>' + obj[i].id3 + '</td>'
+        }
+    }
+
+    thCity += '</tr>'
+    thTable += '</tr>'
+    thChair += '</tr>'
+    thTaburet += '</tr>'
+
+    table += thCity;
+    table += thTable;
+    table += thChair;
+    table += thTaburet;
+    table += '</table></div>';
+
+    // insert into DOM
+    $(table).insertBefore($('#printButtonShop'))
+
+    $('#sumTableCell').html('<b>Столи&nbsp;' + sumTable + '</b>')
+    $('#sumChairCell').html('<b>Стільці&nbsp;' + sumChair + '</b>')
 }
 
 function toggleStatus(url, element) {
@@ -374,7 +378,7 @@ echo CHtml::link(
 
 $urlLabel = array('orderItems/printOrderItemsLabel');
 echo CHtml::link(
-    '<i class="fa fa-print feature-icon"></i> Наклейка на коробку',
+    '<i class="fa fa-print feature-icon"></i> НАКЛЕЙКА НА КОРОБКУ А4',
     $urlLabel,
     array(
         'submit' => $urlLabel,
@@ -385,11 +389,36 @@ echo CHtml::link(
 
 $urlFantik = array('orderItems/printOrderItemsFantik');
 echo CHtml::link(
-    '<i class="fa fa-print feature-icon"></i> Фантік',
+    '<i class="fa fa-print feature-icon"></i> ФАНТІК А4',
     $urlFantik,
     array(
         'submit' => $urlFantik,
         'id'=>'printButtonFantik',
+        'class'=>'bt btn-2 printButton',
+    )
+);
+
+$urlLabelNP = array('orderItems/printOrderItemsLabelNP');
+echo CHtml::link(
+    '<i class="fa fa-print"></i>
+    НАКЛЕЙКА НА КОРОБКУ 10х10',
+    $urlLabelNP,
+    array(
+        'submit' => $urlLabelNP,
+        'id'=>'printButtonLabelNP',
+        'class'=>'bt btn-2 printButton',
+    )
+);
+
+
+$urlFantikNP = array('orderItems/printOrderItemsFantikNP');
+echo CHtml::link(
+    '<i class="fa fa-print"></i>    
+    ФАНТІК 10х10',
+    $urlFantikNP,
+    array(
+        'submit' => $urlFantikNP,
+        'id'=>'printButtonFantikNP',
         'class'=>'bt btn-2 printButton',
     )
 );
@@ -545,14 +574,41 @@ echo CHtml::link(
             ),
 
 
+            // array(
+            //     'class'=>'DToggleColumn',
+            //     'name'=>'joiner',
+            //     'confirmation'=>'Змінити статус?',
+            //     'filter'=>array(1=>'Так', 0=>'Ні'),
+            //     'titles'=>array(1=>'Так', 0=>'Ні'), 
+			// 	'htmlOptions'=>array('width'=>'20px'),
+            // ),   
+            
             array(
-                'class'=>'DToggleColumn',
-                'name'=>'joiner',
-                'confirmation'=>'Змінити статус?',
-                'filter'=>array(1=>'Так', 0=>'Ні'),
-                'titles'=>array(1=>'Так', 0=>'Ні'), 
-				'htmlOptions'=>array('width'=>'20px'),
-            ),         
+                'name' => 'joiner',
+                'type' => 'raw',
+                'filter' => array(1 => 'Так', 0 => 'Ні'),
+                'value' => function ($data) {
+                    $id = $data->primaryKey;
+                    $productType = $data->product->productType->product_type_id;
+                    $links = "";
+            
+                    // If product type is NOT 1, show a single "joiner" button.
+                    if ($productType != "1") {
+                        $links .= generateAjaxLink($id, "joiner", $data->joiner);
+                    }
+                    // If product type is 1, show two buttons: joiner_table_top & joiner_table_bottom.
+                    else {
+                        $links .= generateAjaxLink($id, "joiner_table_top", $data->joiner_table_top);
+                        $links .= '<div style="border-bottom: 1px solid #ccc"></div>';
+                        $links .= generateAjaxLink($id, "joiner_table_bottom", $data->joiner_table_bottom);
+                    }
+            
+                    return $links;
+                },
+                'headerHtmlOptions' => array(
+                    'width' => '165px',
+                ),
+            ),
              
             array(
                 'name' => 'primer',

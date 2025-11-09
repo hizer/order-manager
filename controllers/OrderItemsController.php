@@ -29,12 +29,12 @@ class OrderItemsController extends Controller
         return array(
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
                // 'actions'=>array('pdf','index','create','update','view','checkBox','print','admin','analytics','delete','shipPay','ajaxupdate','printOrderItems','archive', 'joiner', 'packing', 'painter', 'upholstery', 'toggle','cashOrder','customerInvoice', 'dynamic', 'doPdf'),
-              'actions'=>array('pdf','index','create','view','checkBox','print','admin','shipPay','ajaxupdate','printOrderItems','printOrderItemsDate','printOrderItemsShop','printOrderItemsCustomer','printOrderItemsLabel', 'printOrderItemsFantik', 'archive','joiner', 'packing', 'finish', 'finish_table_top', 'finish_table_bottom', 'coating', 'primer', 'primer_table_top','primer_table_bottom','painter', 'upholstery', 'toggle', 'toggleTable','cashOrder','dynamic', 'doPdf'),
+              'actions'=>array('pdf','index','create','view','checkBox','print','admin','shipPay','ajaxupdate','printOrderItems','printOrderItemsDate','printOrderItemsShop','printOrderItemsCustomer','printOrderItemsLabel', 'printOrderItemsLabelNP', 'printOrderItemsFantik', 'printOrderItemsFantikNP',  'archive','joiner', 'joiner_table_top', 'joiner_table_bottom', 'packing', 'finish', 'finish_table_top', 'finish_table_bottom', 'coating', 'primer', 'primer_table_top','primer_table_bottom','painter', 'upholstery', 'toggle', 'toggleTable','cashOrder','dynamic', 'doPdf'),
                   'users'=>array('@'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
               //  'actions'=>array('admin','delete','shipPay','checkBox','print','printOrderItems'),
-                'actions'=>array('pdf','index','create','update','view','checkBox','print','admin', 'finish', 'finish_table_top', 'finish_table_bottom', 'analytics','delete','shipPay','ajaxupdate','printOrderItems','printOrderItemsShop','printOrderItemsCustomer','printOrderItemsLabel', 'printOrderItemsFantik', 'archive', 'joiner', 'packing', 'primer', 'primer_table_top','primer_table_bottom','painter', 'upholstery', 'toggle', 'toggleTable', 'cashOrder','customerInvoice', 'dynamic', 'doPdf', 'rangeFilter', 'getTotalAmountFinishedProduct'),
+                'actions'=>array('pdf','index','create','update','view','checkBox','print','admin', 'finish', 'finish_table_top', 'finish_table_bottom', 'analytics','delete','shipPay','ajaxupdate','printOrderItems','printOrderItemsShop','printOrderItemsCustomer','printOrderItemsLabel', 'printOrderItemsLabelNP', 'printOrderItemsFantik', 'printOrderItemsFantikNP', 'archive', 'joiner', 'joiner_table_top', 'joiner_table_bottom',  'packing', 'primer', 'primer_table_top','primer_table_bottom','painter', 'upholstery', 'toggle', 'toggleTable', 'cashOrder','customerInvoice', 'dynamic', 'doPdf', 'rangeFilter', 'getTotalAmountFinishedProduct'),
                 'expression'=>'User::model()->findByPk(Yii::app()->user->id)->profile==admin',
             ),
             array('deny',  // deny all users
@@ -291,12 +291,12 @@ class OrderItemsController extends Controller
 		$criteriaItems->join ='LEFT JOIN products ON products.product_id = t.product_id';
 		$criteriaItems->condition = 't.'.$jobArt.'_updated > :created_on_start 
 			AND t.'.$jobArt.'_updated < :created_on_end ';
-
-		 $criteriaItems->params = array(
-				 // ':prodTypeId' => $itemType, 
+            $criteriaItems->params = array(
+                // ':prodTypeId' => $itemType, 
 				':created_on_start' => $created_on_start, 
 				':created_on_end' => $created_on_end,
-				);
+            );
+            $criteriaItems->addSearchCondition($jobArt, '1', true, 'AND');
 
 		if($productTypes !=""){
 			$productTypes = explode(",", $productTypes);	
@@ -334,7 +334,7 @@ class OrderItemsController extends Controller
 				$criteria->params = array(
 					':product_type_id' => 1,  
 				);
-			$criteria->addSearchCondition( 'joiner', "1", true, 'AND' );
+			$criteria->addSearchCondition( 'joiner', '1', true, 'AND' );
 		if(isset($_GET[OrderItems][created_on][from]) && $_GET[OrderItems][created_on][from] != ""){ 
 			 	$criteria->compare('joiner_updated ','>='.$_GET[OrderItems][created_on][from]. " 00:00:00");	
 		}else{
@@ -757,11 +757,31 @@ class OrderItemsController extends Controller
 		$criteria=new CDbCriteria;
 		$criteria->addInCondition('order_item_id', $autoIdAll);
 		
-		$dataProvider=new CActiveDataProvider('OrderItems', array(
-					'criteria'=>$criteria,
-				)
+		$dataProvider=new CActiveDataProvider('OrderItems', array('criteria'=>$criteria,
+                'pagination'=>array(
+                    'pageSize'=>500,
+                ),
+                )
 			);		 
         $this->render('printOrderItemsLabel',array(
+            'dataProvider'=>$dataProvider,
+        ));
+    }
+
+    public function actionPrintOrderItemsLabelNP(){
+
+		$autoIdAll = $_POST['autoId'];
+		
+		$criteria=new CDbCriteria;
+		$criteria->addInCondition('order_item_id', $autoIdAll);
+		
+		$dataProvider=new CActiveDataProvider('OrderItems', array('criteria'=>$criteria,
+            'pagination'=>array(
+                'pageSize'=>500,
+            ),
+            )
+        );		 
+        $this->render('printOrderItemsLabelNP',array(
             'dataProvider'=>$dataProvider,
         ));
     }
@@ -773,15 +793,35 @@ class OrderItemsController extends Controller
 		$criteria=new CDbCriteria;
 		$criteria->addInCondition('order_item_id', $autoIdAll);
 		
-		$dataProvider=new CActiveDataProvider('OrderItems', array(
-					'criteria'=>$criteria,
-				)
+		$dataProvider=new CActiveDataProvider('OrderItems', array('criteria'=>$criteria,
+                'pagination'=>array(
+                    'pageSize'=>500,
+                ),
+            )
 			);		 
         $this->render('printOrderItemsFantik',array(
             'dataProvider'=>$dataProvider,
         ));
     }
+    
+    public function actionPrintOrderItemsFantikNP(){
 
+		$autoIdAll = $_POST['autoId'];
+		
+		$criteria=new CDbCriteria;
+		$criteria->addInCondition('order_item_id', $autoIdAll);
+		
+		$dataProvider=new CActiveDataProvider('OrderItems', array('criteria'=>$criteria,
+				'pagination'=>array(
+					'pageSize'=>500,
+				),
+			)
+        );		 
+        $this->render('printOrderItemsFantikNP',array(
+            'dataProvider'=>$dataProvider,
+        ));
+    }
+    
     public function actionCashOrder()
     {
         $shopId = $_POST['shopId'];
@@ -808,6 +848,33 @@ class OrderItemsController extends Controller
             if ($model) {
                 $model->$attribute = ($model->$attribute == 1) ? 0 : 1; // Toggle value
                 Yii::trace("+++++ actionToggleTable before save, attribute: " . $model->$attribute . "id: ". $id, 'info');
+                
+                if ($attribute == 'joiner'){			
+                    $model->joiner_updated = new CDbExpression('NOW()');			 
+                }
+        
+                if ($attribute == 'joiner_table_top'){			
+                    $model->joiner_table_top_updated = new CDbExpression('NOW()');		
+                    if($model->joiner_table_bottom==1 && $model->$attribute == 1){
+                        $model->joiner = 1;
+                        $model->joiner_updated = new CDbExpression('NOW()');	
+                    }else{
+                        $model->joiner = 0;
+                        $model->joiner_updated = new CDbExpression('NOW()');	
+                    }		 
+                }
+        
+                if ($attribute == 'joiner_table_bottom'){			
+                    $model->joiner_table_bottom_updated = new CDbExpression('NOW()');	
+                    if($model->joiner_table_top==1 && $model->$attribute == 1){                       
+                        $model->joiner = 1;
+                        $model->joiner_updated = new CDbExpression('NOW()');	
+                    }else{                        
+                        $model->joiner = 0;
+                        $model->joiner_updated = new CDbExpression('NOW()');	
+                    }		 
+                }
+                
                 if ($attribute == 'primer'){			
                     $model->primer_updated = new CDbExpression('NOW()');			 
                 }
